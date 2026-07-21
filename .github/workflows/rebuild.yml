@@ -1,0 +1,42 @@
+# Daily rebuild of the ssc2 snapshot picker (index.html data block).
+#
+# Place this file at .github/workflows/rebuild.yml on the branch that
+# hosts the web page (see NOTES: scheduled workflows only fire from the
+# repository's DEFAULT branch, which constrains where the page lives --
+# a placement decision for the project lead).
+#
+# The job is deliberately dumb: run build_data.py; if index.html
+# changed, commit and push it. GitHub Pages then redeploys automatically.
+# Runs shortly after the mirror's own daily snapshot job; also
+# triggerable by hand from the Actions tab (workflow_dispatch).
+
+name: rebuild-snapshot-picker
+on:
+  schedule:
+    - cron: "30 6 * * *"   # daily 06:30 UTC; set AFTER the mirror's snapshot run
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Regenerate embedded data
+        run: python3 build_data.py index.html
+      - name: Commit if changed
+        run: |
+          if git diff --quiet index.html; then
+            echo "No data changes; nothing to commit."
+          else
+            git config user.name  "snapshot-picker-bot"
+            git config user.email "actions@users.noreply.github.com"
+            git add index.html
+            git commit -m "Daily data rebuild: $(date -u +%F)"
+            git push
+          fi
