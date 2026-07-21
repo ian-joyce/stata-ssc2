@@ -31,7 +31,7 @@ MIRROR_GIT = "https://github.com/labordynamicsinstitute/ssc-mirror.git"
 MIRROR_RAW = "https://raw.githubusercontent.com/labordynamicsinstitute/ssc-mirror"
 DAILY_START = dt.date(2021, 12, 21)
 DATE_TAG = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-MARK_A, MARK_B = "/* @@DATA-START@@", "@@DATA-END@@ */"
+MARK_A, MARK_B = "/* @@DATA-START@@", "/* @@DATA-END@@ */"
 
 
 def snapshot_tags() -> list[dt.date]:
